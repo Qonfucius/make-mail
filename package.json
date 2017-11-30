@@ -1,0 +1,32 @@
+{
+  "name": "make-mail",
+  "version": "0.0.1",
+  "description": "Tool to generate mails for marketing or transactionnal email",
+  "main": "build-mail.js",
+  "bin": {
+    "make-mail": "./make-mail.js"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Qonfucius/make-mail.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Qonfucius/make-mail/issues"
+  },
+  "homepage": "https://github.com/Qonfucius/make-mail#readme",
+  "dependencies": {
+    "commander": "^2.12.2",
+    "handlebars": "^4.0.11",
+    "handlebars-layouts": "^3.1.4",
+    "inquirer": "^4.0.1",
+    "just-handlebars-helpers": "^1.0.13",
+    "lodash.merge": "^4.6.0",
+    "lodash.pickby": "^4.6.0",
+    "lodash.transform": "^4.6.0",
+    "lodash.trim": "^4.5.1",
+    "mjml": "^3.3.5"
+  }
+}
