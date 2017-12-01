@@ -32,6 +32,9 @@ module.exports = async (config, data, { locale, root = __dirname } = {}) => {
     config = await configWalker(config, root);
   }
   data = Object.assign(config.vars, data);
+  if (!config.template) {
+    throw new Error('template not found');
+  }
   const switchParts = config
     .template
     .split('.')

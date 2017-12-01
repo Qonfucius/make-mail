@@ -1,4 +1,4 @@
-const { join, dirname, relative } = require('path');
+const { resolve, join, dirname, relative } = require('path');
 
 const l_ = { transform: require('lodash.transform') };
 
@@ -11,6 +11,7 @@ const DEFAULT_CONFIG = {
 };
 
 module.exports = async (configFile, rootPath = __dirname) => {
+  rootPath = resolve(rootPath);
   let path = join(rootPath, configFile);
   const configFiles = [path];
 
