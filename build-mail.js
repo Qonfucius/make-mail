@@ -14,6 +14,7 @@ const configWalker = require('./config-walker');
 
 const LOCALE_PLACEHOLDER = '$locale';
 const MJML_EXT = 'mjml';
+const TXT_EXT = 'txt';
 const HBS_EXT = 'hbs';
 
 handlebars.registerHelper(handlebarsLayouts(handlebars));
@@ -32,41 +33,44 @@ module.exports = async (config, data, { locale, root = __dirname } = {}) => {
     config = await configWalker(config, root);
   }
   data = Object.assign(config.vars, data);
-  if (!config.template) {
+  const templateKeys = Object.keys(config.templates);
+  if (!templateKeys.length) {
     throw new Error('template not found');
   }
-  const switchParts = config
-    .template
-    .split('.')
-    .reverse()
-    .filter(p => [LOCALE_PLACEHOLDER, MJML_EXT, HBS_EXT].includes(p));
-  const hasMjml = !!switchParts.find(p => p === MJML_EXT);
-  const hasHbs = !!switchParts.find(p => p === HBS_EXT);
-  let html = await readFile(config.template.replace(LOCALE_PLACEHOLDER, locale));
-  html = html.toString();
+  return Promise.all(templateKeys.map(async (templateKey) => {
+    const template = config.templates[templateKey];
+    const switchParts = template
+      .split('.')
+      .filter(p => [LOCALE_PLACEHOLDER, MJML_EXT, TXT_EXT, HBS_EXT].includes(p));
+    const hasMjml = !!switchParts.find(p => p === MJML_EXT);
+    const hasHbs = !!switchParts.find(p => p === HBS_EXT);
+    let content = await readFile(template.replace(LOCALE_PLACEHOLDER, locale));
+    content = content.toString();
 
-  if (hasHbs) {
-    config.partials = await Promise.all(
-      l_.transform(
-        config.partials,
-        (result, value, key) => result.push(
-          readFile(value.replace(LOCALE_PLACEHOLDER, locale))
-            .then(t => ({ key, value: t.toString() })),
-        ),
-        [],
-      ));
-    config.partials.forEach(({ key, value }) => handlebars.registerPartial(key, value));
-    html = handlebars.compile(html)(data);
-  }
-
-  if (hasMjml) {
-    const mjml = mjml2html(html);
-
-    if (mjml.errors.length) {
-      throw new Error(mjml.errors);
+    if (hasHbs) {
+      config.partials = await Promise.all(
+        l_.transform(
+          config.partials,
+          (result, value, key) => result.push(
+            readFile([value, ...switchParts].join('.').replace(LOCALE_PLACEHOLDER, locale))
+              .then(t => ({ key, value: t.toString() })),
+          ),
+          [],
+        ));
+      config.partials.forEach(({ key, value }) => handlebars.registerPartial(key, value));
+      content = handlebars.compile(content)(data);
     }
-    html = mjml.html;
-  }
 
-  return html;
+    if (hasMjml) {
+      const mjml = mjml2html(content);
+
+      if (mjml.errors.length) {
+        throw new Error(mjml.errors);
+      }
+      content = mjml.html;
+    }
+
+
+    return {[templateKey]: content};
+  })).then(array => array.reduce((a, b) => Object.assign(a, b), {}));
 };

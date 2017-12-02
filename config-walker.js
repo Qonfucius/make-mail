@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
   vars: {},
   questions: [],
   partials: {},
-  template: null,
+  templates: {},
 };
 
 module.exports = async (configFile, rootPath = __dirname) => {
@@ -45,8 +45,15 @@ module.exports = async (configFile, rootPath = __dirname) => {
           );
           Object.assign(merged.partials, partials);
         }
-        if (config.template) {
-          merged.template = join(dir, config.template);
+        if (config.templates) {
+          Object.assign(
+            merged.templates,
+            l_.transform(
+              config.templates,
+              (result, value, key) => { result[key] = join(dir, value); },
+              {},
+            )
+          );
         }
         return merged;
       },
