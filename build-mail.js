@@ -5,7 +5,7 @@ const l_ = {
   transform: require('lodash.transform'),
   trim: require('lodash.trim'),
 };
-const { mjml2html } = require('mjml');
+const mjml2html = require('mjml');
 const handlebars = require('handlebars');
 const handlebarsLayouts = require('handlebars-layouts');
 const helpers = require('just-handlebars-helpers');
@@ -63,14 +63,13 @@ module.exports = async (config, data, { locale, root = __dirname } = {}) => {
 
     if (hasMjml) {
       const mjml = mjml2html(content);
-
       if (mjml.errors.length) {
-        throw new Error(mjml.errors);
+        throw new Error('Compilation failed');
       }
       content = mjml.html;
     }
 
 
-    return {[templateKey]: content};
+    return { [templateKey]: content };
   })).then(array => array.reduce((a, b) => Object.assign(a, b), {}));
 };

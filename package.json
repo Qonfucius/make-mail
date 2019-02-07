@@ -1,6 +1,6 @@
 {
   "name": "make-mail",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tool to generate mails for marketing or transactionnal email",
   "main": "build-mail.js",
   "bin": {
@@ -21,12 +21,12 @@
     "commander": "^2.12.2",
     "handlebars": "^4.1.0",
     "handlebars-layouts": "^3.1.4",
-    "inquirer": "^4.0.1",
+    "inquirer": "^6.2.2",
     "just-handlebars-helpers": "^1.0.14",
     "lodash.merge": "^4.6.1",
     "lodash.pickby": "^4.6.0",
     "lodash.transform": "^4.6.0",
     "lodash.trim": "^4.5.1",
-    "mjml": "^3.3.5"
+    "mjml": "^4.3.1"
   }
 }

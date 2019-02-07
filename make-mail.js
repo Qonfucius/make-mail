@@ -37,24 +37,26 @@ if (!file) {
 (async () => {
   const config = await configWalker(file, process.cwd());
   merge(config.vars, environnements);
-  const prompted = await inquirer.prompt(
-    (config
-      .questions || [])
-      .map((question) => {
-        if (typeof question === 'string') {
-          return {
-            type: 'input',
-            name: question,
-            message: question,
-          };
-        }
-        return question;
-      })
-      .filter(({ name }) => !config.vars[name]),
-  );
+  const prompted = await inquirer.prompt((config
+    .questions || [])
+    .map((question) => {
+      if (typeof question === 'string') {
+        return {
+          type: 'input',
+          name: question,
+          message: question,
+        };
+      }
+      return question;
+    })
+    .filter(({ name }) => !config.vars[name]));
   const html = await buildMail(config, prompted, { locale });
+  const keys = Object.keys(html);
   if (output) {
-    await writeFile(output, html);
+    await Promise.all(keys.map((async (k) => {
+      return writeFile(`${output}.${k}`, html[k]);
+    })));
+  } else {
+    keys.forEach(k => process.stdin.write(html[k]));
   }
-  process.stdin.write(html);
 })();

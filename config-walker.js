@@ -52,7 +52,7 @@ module.exports = async (configFile, rootPath = __dirname) => {
               config.templates,
               (result, value, key) => { result[key] = join(dir, value); },
               {},
-            )
+            ),
           );
         }
         return merged;
